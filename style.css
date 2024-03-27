@@ -1,0 +1,691 @@
+/* 
+Theme Name: Hello Elementor Child
+Theme URI: https://github.com/elementor/hello-theme-child/
+Description: Hello Elementor Child is a child theme of Hello Elementor, created by Elementor team
+Author: Elementor Team
+Author URI: https://elementor.com/
+Template: hello-elementor
+Version: 2.0.0
+Text Domain: hello-elementor-child
+License: GNU General Public License v3 or later.
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Tags: flexible-header, custom-colors, custom-menu, custom-logo, editor-style, featured-images, rtl-language-support, threaded-comments, translation-ready
+*/
+
+/* Add your custom styles here */
+
+/** Hotel Card Color Variables **/
+
+.pi-color-code-red{
+  --pi-color: #AC0007;  
+}
+.pi-color-code-blue{
+  --pi-color: #002D9F;  
+}
+
+
+
+/*UI Fixes*/
+
+.flatpickr-current-month{
+  display: flex !important;
+}
+
+/* Point of Area Widget */
+
+.pi-poa-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns by default */
+  gap: 0px 20px; /* Adjust the gap between columns as needed */
+
+  /* Media query for max width 1024px */
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns for screens up to 1024px */
+  }
+
+  /* Media query for max width 767px */
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr; /* 1 column for screens up to 767px */
+  }
+}
+
+.pi-poa-item {
+  box-sizing: border-box;
+  padding: 15px 0px;
+  position: relative;
+  display: inline-block;  
+}
+
+.pi-poa-item.button-action {
+  align-self: end;
+}
+
+.pi-poa-item label {
+  color: #FFFFFF;
+  font-family: 'Inter';
+  font-size: 16px;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.pi-poa-item label.error{
+  color: #FF0000;
+}
+
+.pi-datepicker {
+  padding: 15px 30px 15px 15px !important;
+  border-radius: 4px !important;
+  border: none !important;
+  outline: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	color: black;
+	text-align: left;
+}
+
+.pi-datepicker::-webkit-date-and-time-value {
+	text-align: left;
+}
+
+
+.pi-datepicker-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px; /* Adjust the right spacing as needed */ 
+  cursor: pointer;
+}
+
+.fa-calendar-days{
+  color: #002D9F;
+}
+
+
+/* Dropdown */
+
+.dropdown-filters{
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+}
+
+.filter-input {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px;
+  line-height: normal;
+  font-size: 16px;
+  position: relative;
+  border-radius: 4px;
+	color: black;
+}
+
+.dropdown-filters.active .filter-input {
+  border-radius: 4px 4px 0 0;
+}
+
+.dropdown-filters .fa {
+  transition: transform .2s;
+}
+
+.dropdown-filters.active .fa {
+  transform: rotate(180deg);
+}
+
+.dropdown-filters ul.filter-options {
+  display: none;
+  background: #fff;
+  margin: 0;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  z-index: 10;
+  list-style: none;
+  box-shadow: 0 2px 2px rgba(0,0,0,.05);
+  border-radius: 0 0 3px 3px;
+  border-top: 1px solid #eee;
+  overflow: hidden;
+  padding-left: 0;
+}
+
+.dropdown-filters.active .filter-options {
+  display: block;
+  max-height: 300px;
+  overflow-y: scroll;
+  z-index: 9999;
+}
+
+.dropdown-filters ul li {
+  font-size: 16px;
+  line-height: normal;
+  padding: 5px 10px;
+  margin: 0;
+  cursor: pointer;
+  transition: all .3s;
+}
+
+.dropdown-filters ul li:hover {
+  background-color: #eeeeee;
+}
+
+.dropdown-filters ul li a {
+  display: block;
+  color: #1D1D1D;
+  font-size: 16px;
+  text-transform: capitalize;
+}
+
+
+button.pi-book-now {
+  display: inline-block;
+  width: 100%;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  border: 1px solid #FFFFFF;
+  border-radius: 0;
+  font-family: 'Inter';
+  font-size: 16px;
+  font-weight: 700;
+  padding: 15px;
+}
+
+button.pi-book-now:hover,
+button.pi-book-now:focus{
+  color: #002D9F;
+  background-color: #FFFFFF;
+  outline: none;
+}
+
+.pi-error-messages {
+  display: block;
+  font-size: 16px;
+  color: #002D9F;
+  padding: 15px 20px;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+}
+
+.pi-error-messages ul{
+  padding-left: 10px;
+}
+
+
+/** Headings **/
+
+.pi-hotel-headings{
+  text-align:  center;
+}
+
+
+/** Listings **/
+
+.pi-hotel-lists {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 equal-width columns */
+  gap: 20px; /* Adjust the gap between columns as needed */
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  margin-bottom: 50px;
+}
+
+.pi-hotel-item {
+  box-sizing: border-box;
+  padding: 15px;
+  border: 1px solid #ccc;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;  
+  text-align: center;
+}
+
+.pi-hotel-item.red h3,
+.pi-hotel-item.red .price span,
+.pi-hotel-item.red .pi-actions .more-info{
+  color: var( --e-global-color-e55f62f );
+}
+
+
+.pi-hotel-item.blue h3,
+.pi-hotel-item.blue .price span,
+.pi-hotel-item.blue .pi-actions .more-info{
+  color: var( --e-global-color-59ce220);
+}
+
+
+.pi-more-info{
+  background-color: #F4F4F4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: 20px;
+  padding: 30px;
+}
+
+.pi-actions {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+  justify-items: center;
+  padding: 0px 55px;
+}
+
+/* Hotel Booking Widget */
+
+.pi-hotel-booking-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 4 columns by default */
+  gap: 0px 20px; /* Adjust the gap between columns as needed */
+
+  /* Media query for max width 1024px */
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr); /* 2 columns for screens up to 1024px */
+  }
+
+  /* Media query for max width 767px */
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr; /* 1 column for screens up to 767px */
+  }
+}
+
+.pi-hotel-field{
+  position: relative;  
+  box-sizing: border-box;
+  padding: 15px 0px;
+  position: relative;
+  display: inline-block;
+}
+
+.pi-hotel-field label{
+  color: #FFFFFF;
+  font-family: 'Inter';
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.pi-hotel-field.actions{
+  align-self: end;
+}
+
+.pi-hotel-field.actions button{
+  display: inline-block;
+  width: 100%;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  border: 1px solid #FFFFFF;
+  border-radius: 0;
+  font-family: 'Inter';
+  font-size: 16px;
+  font-weight: 700;
+  padding: 15px;
+}
+
+.pi-hotel-field.actions button:hover{
+  color: var(--palace-inn-color-theme) !important;
+  background-color: #FFFFFF;
+}
+
+.pi-hotel-field .fa-calendar-days{
+  color: var(--palace-inn-color-theme) !important;
+}
+
+.pi-amenities-red{  display: var(--palace-inn-amenities-red);}
+.pi-amenities-blue{ display: var( --palace-inn-amenities-blue);}
+
+/** More Info Pop up**/
+#pi-pop-up-content{
+  font-size: 14px;
+  display:none;
+  max-width: 750px;
+  padding: 0;
+}
+
+.pi-pop-up-content h3{
+  background-color: var(--palace-inn-color-theme);
+  color: #FFFFFF;
+  padding: 0.5rem 2rem 0.5rem 2rem;
+  margin-top: 0;
+}
+
+.pi-pop-up-content .pop-content{
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 0 2rem 2rem 2rem;
+}
+
+.pop-content h2{
+  font-size: 24px;
+}
+
+.pop-content ul{
+  padding-left: 0px;
+  list-style-type: none;  
+}
+
+.pop-content ul li::before{
+  
+  list-style-type: none;  
+  content: "\f058";
+  font-family: "Font Awesome 6 Free";
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: var(--fa-display, inline-block);
+  font-style: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-rendering: auto;
+  font-weight: 400;
+  color: var(--palace-inn-color-theme);
+  padding-right: 10px;
+}
+
+.fancybox__content>.f-button.is-close-btn{
+  top: 0 !important;
+  color: #FFFFFF;
+  cursor: pointer;
+}
+.fancybox__content>.f-button.is-close-btn:focus,
+.fancybox__content>.f-button.is-close-btn:active{
+  background-color: unset;
+}
+
+/** Map and Map Filter **/
+
+.pi-hotel-filter{
+  position: relative;
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  background-color: #002D9F;
+  padding: 20px 0;  
+}
+
+.pi-hotel-filter .pi-filter-items{
+  width: 1100px;
+  display: grid;
+  grid-template-columns: 70% 30%;
+  gap: 30px;
+  justify-items: self-start;
+  margin: 0 auto;
+  align-items: center;
+}
+
+
+.pi-hotel-filter .pi-filter-items .pi-filter-item{
+  width: 100%;
+  position: relative;
+}
+
+.pi-filter-item.pi-location  input[type="text"]{
+  padding: 10px 42px 10px 20px;
+  font-family: "Inter", Sans-serif;
+  font-size: 16px;
+  outline: none;
+  border-radius: 6px;
+}
+
+.pi-filter-item.pi-location .pi-icon{
+  width: 42px;
+  height: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pi-filter-item.pi-distance{
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  gap: 5px;
+  font-family: 'Inter', sans-serif;
+}
+
+.pi-filter-item.pi-distance span{
+  color: #FFFFFF;
+}
+
+.pi-filter-item.pi-distance ul{
+  list-style-type: none;
+  padding-left: 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px
+}
+
+.pi-filter-item.pi-distance ul li{
+  position: relative;
+
+}
+
+.pi-filter-item.pi-distance ul li a{
+  width: 36px;
+  height: 36px;
+  border-radius: 100%;
+  background-color: #002D9F;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #FFFFFF;
+  border: 1px solid #FFFFFF;
+  transition: all ease .3s;
+  font-size: 16px;;
+}
+
+.pi-filter-item.pi-distance ul li a.active,
+.pi-filter-item.pi-distance ul li a:hover{
+  color: #002D9F;
+  background-color: #FFFFFF;
+}
+
+.pin-icon {
+  width: 37px;
+  height: 56px;
+  color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  padding-bottom: 20px;
+  font-size: 14px;
+}
+
+/** AutoComplete Styles **/
+.ui-autocomplete {
+	padding: 0;
+	color: black;
+	font-size: 16px;
+  list-style: none;
+  background-color: #FFFFFF;
+	box-shadow: 0 4px 12px -2px rgba(0,0,0,0.2);
+  z-index: 999;
+  display: flex;
+  width: 770px !important;
+  flex-direction: column;
+}
+.ui-autocomplete li div {
+	cursor: pointer;
+	padding: 10px;
+	margin: 0;
+}
+.ui-autocomplete li div::before {
+	content: '\f3c5';
+	display: inline-block;
+	position: relative;
+	font-family: 'Font Awesome 5 Free';
+	font-size: 16px;
+	color: darkgray;
+	font-weight: 900;
+   	font-style: normal;
+   	font-variant: normal;
+   	text-rendering: auto;
+   	-webkit-font-smoothing: antialiased;
+	margin-right: 10px;
+}
+.ui-autocomplete li:not(:last-child) div {
+	border-bottom: 1px solid #ccc;
+}
+.ui-autocomplete li div:hover {
+	background: #eee;
+}
+
+#pi-map{
+  width: 100%;
+	min-height: 500px;
+}
+
+.pi-map-overlay{
+  display: flex;
+  position: absolute;
+  width: 100%;
+  min-height: 500px;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #FFFFFF;
+  pointer-events: none;  
+  -webkit-transition: opacity ease-in-out;
+  transition: opacity ease-in-out;
+}
+
+.pi-map-overlay .mobile{
+  display: none;
+}
+
+/** Map Pop Up**/
+
+.leaflet-popup-content {
+  margin: 10px;
+	width: 300px
+}
+
+.leaflet-popup-content p{
+  margin: 0 !important;
+  font-family: "Inter", Sans-serif;
+  display: block;
+  width: 100%;
+	font-size: 12px
+}
+
+.leaflet-popup-close-button {
+	top: 5px !important;
+	right: 5px !important;
+}
+
+.leaflet-popup-close-button span {
+	font-size: 24px;
+}
+
+.pi-popup {
+  display: flex;
+  font-family: "Inter", Sans-serif;
+}
+
+.pi-popup p{
+  font-family: "Inter", Sans-serif;
+}
+
+
+.leaflet-popup-content,
+.pi-popup h3{
+  text-align: center;
+}
+
+.pi-popup-contacts {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.pi-popup-contacts .pi-popup-item{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  row-gap: 5px;
+  text-align: center;
+}
+
+.pi-popup-contacts .pi-popup-item:first-child{
+  text-align: left;
+  width: 60%;
+}
+.pi-popup-contacts .pi-popup-item:last-child{
+  width: 40%;
+}
+
+.pi-popup-contacts .pi-popup-item .cta{
+  display: block;
+  position: relative;
+  font-family: "Inter", Sans-serif;
+  padding: 7px;
+  width: 100%;
+	line-height: 1;
+}
+
+.pi-popup-contacts.red .cta{
+  border: 1px solid #AC0007;
+  color:#AC0007;
+}
+
+.pi-popup-contacts.red .cta:last-child {
+  background: #AC0007;
+  color: #fff;
+}
+
+.pi-popup-contacts.blue .cta{
+  border: 1px solid #002D9F;
+  color: #002D9F;
+}
+
+.pi-popup-contacts.blue .cta:last-child {
+  background: #002D9F;
+  color: #fff;
+}
+
+@media screen and (max-width: 1024px) {
+  #pi-map{
+    height: 400px;
+	  min-height: 0;
+  }
+
+  .pi-hotel-filter{
+    padding: 20px 30px 30px;
+    position: relative;
+    display: flex;
+  }
+
+  .pi-hotel-filter .pi-filter-items{
+    max-width: 1024px;
+    grid-template-columns: 1fr;
+    position: relative;
+  }
+	.ui-autocomplete {
+		width: calc(100% - 60px) !important;
+	}
+}
+
+@media (max-width: 767px) {
+
+  #pi-map{
+    height: 400px;
+  }
+  .pi-hotel-filter .pi-filter-items {
+      grid-template-columns: 1fr; /* Single column layout for screens up to 767px wide */
+  }
+.ui-autocomplete li div {
+	font-size: 14px;
+}
+}

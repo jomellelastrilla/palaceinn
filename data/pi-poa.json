@@ -1,0 +1,144 @@
+{
+  "area" : [    
+    {
+        "id": 1,
+        "region": "Beltway 8 (Sam Houston Pkwy)",
+        "code": "BLTW"
+    },
+    {
+        "id": 7,
+        "region": "FM 1960",
+        "code": "FM1960"
+    },
+    {
+        "id": 8,
+        "region": "FM 646",
+        "code": "FM646"
+    },
+    {
+        "id": 9,
+        "region": "Hwy 6",
+        "code": "Hwy6"
+    },
+    {
+        "id": 10,
+        "region": "I-10",
+        "code": "I-10"
+    },
+    {
+        "id": 11,
+        "region": "I-45",
+        "code": "I-45"
+    },
+    {
+        "id": 12,
+        "region": "I-610 (inner loop)",
+        "code": "I-610I"
+    },
+    {
+        "id": 13,
+        "region": "I-610 (outer loop)",
+        "code": "I-610o"
+    },
+    {
+        "id": 14,
+        "region": "TX 146",
+        "code": "TX146"
+    },
+    {
+        "id": 15,
+        "region": "TX-225",
+        "code": "TX-225"
+    },
+    {
+        "id": 16,
+        "region": "TX-249 (Tomball Parkway)",
+        "code": "TX-249"
+    },
+    {
+        "id": 17,
+        "region": "El Paso",
+        "code": "ELPASO"
+    },
+    {
+        "id": 18,
+        "region": "TX-288",
+        "code": "TX-288"
+    },
+    {
+        "id": 19,
+        "region": "IAH Airport",
+        "code": "IAH"
+    },
+    {
+        "id": 20,
+        "region": "TX-330 Spur S",
+        "code": "TX-330S"
+    },
+    {
+        "id": 21,
+        "region": "U.S. 290",
+        "code": "US290"
+    },
+    {
+        "id": 22,
+        "region": "US-59 (I-69)",
+        "code": "US-59I69"
+    },
+    {
+        "id": 23,
+        "region": "Westpark Tollway",
+        "code": "Westpark"
+    },
+    {
+        "id": 24,
+        "region": "FM 2920",
+        "code": "FM2920"
+    },
+    {
+        "id": 25,
+        "region": "Spencer Highway",
+        "code": "SPENCER"
+    },
+    {
+        "id": 26,
+        "region": "NASA Space Center",
+        "code": "NASA"
+    },
+    {
+        "id": 27,
+        "region": "Sam Houston Race Park",
+        "code": "SamHousto"
+    },
+    {
+        "id": 28,
+        "region": "TX-99",
+        "code": "TX-99"
+    },
+    {
+        "id": 29,
+        "region": "US-90 ALT W",
+        "code": "US-90ALT"
+    },
+    {
+        "id": 30,
+        "region": "FM 529",
+        "code": "FM529"
+    },
+    {
+        "id": 31,
+        "region": "Humble",
+        "code": "Humble"
+    },
+    {
+        "id": 32,
+        "region": "Crosby",
+        "code": "Crosby"
+    },
+    {
+        "id": 33,
+        "region": "Hankamer",
+        "code": "Hankamer"
+    }
+  ]  
+}
