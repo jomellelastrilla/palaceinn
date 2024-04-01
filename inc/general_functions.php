@@ -17,6 +17,7 @@ function pi_localize_scripts() {
 
   if ( is_page('contact-us') ):
     $args['hotels'] = pi_hotel_lists();
+    $args['hotel_id'] = isset($_GET['hotel_id']) ? $_GET['hotel_id'] : false; 
   endif;
 
   wp_localize_script('pi-script','PI_DATA', $args);    
