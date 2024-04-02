@@ -56,7 +56,10 @@ function hello_elementor_child_scripts_styles() {
     
  
 
+
   wp_enqueue_script('pi-script', get_stylesheet_directory_uri() . '/js/pi-scripts.js', array('jquery'), PI_VERSION, TRUE);
+
+  wp_enqueue_script('google-maps-api', 'https://maps.googleapis.com/maps/api/js?key=' . G_MAP_ID . '&callback=initGoogleMap', array('jquery'), null, true);
   pi_localize_scripts(); 
 
 }

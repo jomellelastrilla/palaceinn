@@ -1,5 +1,99 @@
 var $ = jQuery.noConflict();
 
+function buildContent(property) {
+  const content = document.createElement("div");
+
+  content.classList.add("property");
+  content.innerHTML = `
+    <div class="icon">        
+        <img src="${property.map_pin}">
+        <span>${property.order}</span>
+    </div>
+    <div class="content">
+      <h3>${property.title}</h3>
+      <div class="featured-image">
+        <img src="${property.image}" alt="${property.title}}" width="" max-height="200px"/>
+      </div>
+      <div class="contacts">
+        <div class="contact">
+          <p class="address"><strong>Address:</strong> ${property.address}</p>   
+          <p class="phone"><strong>Phone:</strong> ${property.phone}</p>   
+        </div>
+        <div class="cta ${property.color}">
+          <a href="${property.link}">More Info</a>
+          <a href="${property.booking_url}" target="_blank">Book Now</a>
+        </div>
+      </div>
+    </div>
+    `;
+  return content;
+}
+
+function toggleHighlight(markerView, property) {
+  if (markerView.content.classList.contains("highlight")) {
+    markerView.content.classList.remove("highlight");
+    markerView.zIndex = null;
+  } else {
+    markerView.content.classList.add("highlight");
+    markerView.zIndex = 1;
+  }
+}
+
+async function initGoogleMap(){
+
+  // Request needed libraries.
+  const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+
+  // Specify the coordinates where you want the map to be centered
+  var centerCoordinates =  { lat: 29.76035220031458, lng: -95.3665050615942};
+  // var centerCoordinates = { lat: 40.7128, lng: -74.0060 }; // New York City coordinates
+
+  var hotels = PI_DATA.mapCoordinates;
+
+  // Create a map object and specify the DOM element for display.
+  var map = new Map(document.getElementById('pi-map2'), {
+      center: centerCoordinates,
+      zoom: 12, // You can adjust the zoom level as needed
+      mapId: '4504f8b37365c3d0',
+  });
+
+
+  // Create an info window to share between markers.
+  const infoWindow = new InfoWindow();
+  
+  // Loop through the locations array to create map pins
+  $.each(hotels, function(index, hotel) {
+
+      const pin = new PinElement({
+        glyph: `${hotel.order}`,
+      });
+
+     var coordinates = hotel.coordinates.split(",").map(function (coord) {
+       return parseFloat(coord.trim());
+     });
+
+     
+
+      const marker = new AdvancedMarkerElement({
+          position: { lat: coordinates[0], lng: coordinates[1] },
+          map: map,
+          content: buildContent(hotel),
+          title: hotel.title
+      });
+
+      marker.addListener('click', ({ domEvent, latLng }) => {
+        toggleHighlight(marker, hotel);
+        // const { target } = domEvent;
+
+        // infoWindow.close();
+        // infoWindow.setContent(marker.title);
+        // infoWindow.open(marker.map, marker);
+      });
+  });
+ 
+}
+
 $(function () {
   /** Map Initialize  **/
 
@@ -40,6 +134,35 @@ $(function () {
 
     // Return true if there are no errors, otherwise false
     return $container.find("label.error").length === 0;
+  }
+
+
+  function initGoogleMap(hotels){
+
+     // Specify the coordinates where you want the map to be centered
+     var centerCoordinates =  { lat: 29.76035220031458, lng: -95.3665050615942};
+     // var centerCoordinates = { lat: 40.7128, lng: -74.0060 }; // New York City coordinates
+
+     // Create a map object and specify the DOM element for display.
+     var map = new google.maps.Map($('#pi-map2'), {
+         center: centerCoordinates,
+         zoom: 12 // You can adjust the zoom level as needed
+     });
+
+     
+     // Loop through the locations array to create map pins
+     $.each(hotels, function(index, hotel) {
+
+        var coordinates = hotel.coordinates.split(",").map(function (coord) {
+          return parseFloat(coord.trim());
+        });
+         var marker = new google.maps.Marker({
+             position: { lat: coordinates[0], lng: coordinates[1] },
+             map: map,
+             title: hotel.title
+         });
+     });
+    
   }
 
   function initializeMap(hotels) {
@@ -424,6 +547,7 @@ $(function () {
 
   if ($("#pi-map").length) {
     initializeMap(PI_DATA.mapCoordinates);
+    // initGoogleMap(PI_DATA.mapCoordinates);
   }
 
   /**  Check if Page is Single Hotel Page and Append Hotel ID**/
