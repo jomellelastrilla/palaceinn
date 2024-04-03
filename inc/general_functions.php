@@ -75,7 +75,8 @@ function pi_hotel_map_places() {
             'color'       => $color_code,
             'map_pin'     => site_url('/wp-content/themes/hello-theme-child/assets/' . $color_code . '-marker-plain.png'),
             'phone'       => get_field('contact_number'),
-            'order'       => $order
+            'order'       => $order,
+            'starting_price'=> get_field('staring_price')
           ));
           $order++;
       }     
@@ -180,4 +181,24 @@ function pi_get_user_coordinates() {
       return null;
   }
 }
+
+function haversineGreatCircleDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000) {
+  // Convert degrees to radians
+  $latFromRad = deg2rad($latitudeFrom);
+  $lonFromRad = deg2rad($longitudeFrom);
+  $latToRad = deg2rad($latitudeTo);
+  $lonToRad = deg2rad($longitudeTo);
+
+  $latDelta = $latToRad - $latFromRad;
+  $lonDelta = $lonToRad - $lonFromRad;
+
+  $a = sin($latDelta / 2) * sin($latDelta / 2) +
+      cos($latFromRad) * cos($latToRad) *
+      sin($lonDelta / 2) * sin($lonDelta / 2);
+
+  $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+  return $earthRadius * $c;
+}
+
 ?>

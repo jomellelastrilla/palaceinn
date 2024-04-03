@@ -39,63 +39,74 @@ function toggleHighlight(markerView, property) {
   }
 }
 
-async function initGoogleMap(){
-
-  // Request needed libraries.
-  const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-  const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
-
-  // Specify the coordinates where you want the map to be centered
-  var centerCoordinates =  { lat: 29.76035220031458, lng: -95.3665050615942};
-  // var centerCoordinates = { lat: 40.7128, lng: -74.0060 }; // New York City coordinates
-
-  var hotels = PI_DATA.mapCoordinates;
-
-  // Create a map object and specify the DOM element for display.
-  var map = new Map(document.getElementById('pi-map2'), {
-      center: centerCoordinates,
-      zoom: 12, // You can adjust the zoom level as needed
-      mapId: '4504f8b37365c3d0',
-  });
 
 
-  // Create an info window to share between markers.
-  const infoWindow = new InfoWindow();
-  
-  // Loop through the locations array to create map pins
-  $.each(hotels, function(index, hotel) {
 
-      const pin = new PinElement({
-        glyph: `${hotel.order}`,
-      });
-
-     var coordinates = hotel.coordinates.split(",").map(function (coord) {
-       return parseFloat(coord.trim());
-     });
-
-     
-
-      const marker = new AdvancedMarkerElement({
-          position: { lat: coordinates[0], lng: coordinates[1] },
-          map: map,
-          content: buildContent(hotel),
-          title: hotel.title
-      });
-
-      marker.addListener('click', ({ domEvent, latLng }) => {
-        toggleHighlight(marker, hotel);
-        // const { target } = domEvent;
-
-        // infoWindow.close();
-        // infoWindow.setContent(marker.title);
-        // infoWindow.open(marker.map, marker);
-      });
-  });
- 
-}
 
 $(function () {
   /** Map Initialize  **/
+
+  let map;
+
+  function centerMapOnCoordinates(lat, lng) {
+    const userLocation = new google.maps.LatLng(lat, lng); // Create a LatLng object
+    map.setCenter(userLocation); // Set the map center to the user's coordinates
+  }
+
+  async function initGoogleMap(){
+
+    // Request needed libraries.
+    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+  
+    // Specify the coordinates where you want the map to be centered
+    var centerCoordinates =  { lat: 29.76035220031458, lng: -95.3665050615942};
+    // var centerCoordinates = { lat: 40.7128, lng: -74.0060 }; // New York City coordinates
+  
+    var hotels = PI_DATA.mapCoordinates;
+  
+    // Create a map object and specify the DOM element for display.
+    map = new Map(document.getElementById('pi-map2'), {
+        center: centerCoordinates,
+        zoom: 12, // You can adjust the zoom level as needed
+        mapId: '4504f8b37365c3d0',
+    });
+  
+  
+    // Create an info window to share between markers.
+    const infoWindow = new InfoWindow();
+    
+    // Loop through the locations array to create map pins
+    $.each(hotels, function(index, hotel) {
+  
+        const pin = new PinElement({
+          glyph: `${hotel.order}`,
+        });
+  
+       var coordinates = hotel.coordinates.split(",").map(function (coord) {
+         return parseFloat(coord.trim());
+       });
+  
+       
+  
+        const marker = new AdvancedMarkerElement({
+            position: { lat: coordinates[0], lng: coordinates[1] },
+            map: map,
+            content: buildContent(hotel),
+            title: hotel.title
+        });
+  
+        marker.addListener('click', ({ domEvent, latLng }) => {
+          toggleHighlight(marker, hotel);
+          // const { target } = domEvent;
+  
+          // infoWindow.close();
+          // infoWindow.setContent(marker.title);
+          // infoWindow.open(marker.map, marker);
+        });
+    });
+   
+  }
 
   function parse_area_booking_data($container) {
     const code = $container.find(".value").data("value");
@@ -135,36 +146,7 @@ $(function () {
     // Return true if there are no errors, otherwise false
     return $container.find("label.error").length === 0;
   }
-
-
-  function initGoogleMap(hotels){
-
-     // Specify the coordinates where you want the map to be centered
-     var centerCoordinates =  { lat: 29.76035220031458, lng: -95.3665050615942};
-     // var centerCoordinates = { lat: 40.7128, lng: -74.0060 }; // New York City coordinates
-
-     // Create a map object and specify the DOM element for display.
-     var map = new google.maps.Map($('#pi-map2'), {
-         center: centerCoordinates,
-         zoom: 12 // You can adjust the zoom level as needed
-     });
-
-     
-     // Loop through the locations array to create map pins
-     $.each(hotels, function(index, hotel) {
-
-        var coordinates = hotel.coordinates.split(",").map(function (coord) {
-          return parseFloat(coord.trim());
-        });
-         var marker = new google.maps.Marker({
-             position: { lat: coordinates[0], lng: coordinates[1] },
-             map: map,
-             title: hotel.title
-         });
-     });
-    
-  }
-
+ 
   function initializeMap(hotels) {
     // Loop through the hotels array and add markers with popups to the map
     var bounds = new L.LatLngBounds();
@@ -296,41 +278,41 @@ $(function () {
   }
 
   if ($("#pi-map").length) {
-    const initialCoordinates = [29.76035220031458, -95.3665050615942];
+    // const initialCoordinates = [29.76035220031458, -95.3665050615942];
 
-    var map = L.map("pi-map").setView(initialCoordinates, 13);
-    // Add Google Maps as a tile layer
-    L.tileLayer("https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
-      maxZoom: 17,
-      subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      attributionControl: false, // Disable the default attribution control
-    }).addTo(map);
+    // var map = L.map("pi-map").setView(initialCoordinates, 13);
+    // // Add Google Maps as a tile layer
+    // L.tileLayer("https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+    //   maxZoom: 17,
+    //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
+    //   attributionControl: false, // Disable the default attribution control
+    // }).addTo(map);
 
-    map.scrollWheelZoom.disable();
+    // map.scrollWheelZoom.disable();
 
-    map.attributionControl.remove();
+    // map.attributionControl.remove();
 
-    $("#pi-map").on("wheel", function (e) {
-      if (!e.ctrlKey) {
-        map.scrollWheelZoom.disable();
-        $(".pi-map-overlay").removeClass("hide");
-      } else {
-        map.scrollWheelZoom.enable();
-        $(".pi-map-overlay").addClass("hide");
-      }
-    });
+    // $("#pi-map").on("wheel", function (e) {
+    //   if (!e.ctrlKey) {
+    //     map.scrollWheelZoom.disable();
+    //     $(".pi-map-overlay").removeClass("hide");
+    //   } else {
+    //     map.scrollWheelZoom.enable();
+    //     $(".pi-map-overlay").addClass("hide");
+    //   }
+    // });
 
-    $("#pi-map").on("touchstart", function (e) {
-      if (e.originalEvent.touches.length > 1) {
-        map.touchZoom.enable();
-        map.scrollWheelZoom.enable();
-        $(".pi-map-overlay").addClass("hide");
-      } else {
-        map.touchZoom.disable();
-        map.scrollWheelZoom.disable();
-        $(".pi-map-overlay").removeClass("hide");
-      }
-    });
+    // $("#pi-map").on("touchstart", function (e) {
+    //   if (e.originalEvent.touches.length > 1) {
+    //     map.touchZoom.enable();
+    //     map.scrollWheelZoom.enable();
+    //     $(".pi-map-overlay").addClass("hide");
+    //   } else {
+    //     map.touchZoom.disable();
+    //     map.scrollWheelZoom.disable();
+    //     $(".pi-map-overlay").removeClass("hide");
+    //   }
+    // });
 
     // Listen for wheel event on the map container
     // $(map.getContainer()).on('wheel', function(event) {
@@ -512,8 +494,29 @@ $(function () {
 
               // Update Leaflet map center
               const miles = parseInt($("#miles a.active").data("miles"));
-              const zoomLevel = calculateZoomLevel(map, latLng, miles);
-              map.setView(latLng, zoomLevel);
+              // const zoomLevel = calculateZoomLevel(map, latLng, miles);
+              centerMapOnCoordinates(data.lat, data.lng);
+              // map.setView(latLng, zoomLevel);
+              $.ajax({
+                url: PI_DATA.ajaxMapUrl,
+                type: 'POST',
+                dataType: "json",
+                data: {
+                  action: 'pi_hotel_location_query',
+                  lat: data.lat,
+                  lng: data.lng
+                },
+                success: function ({ data, success }) {
+                  if (success){
+
+                    let hotels = data;
+
+                   
+                    $('.pi-hotel-lists').empty();
+                    $('.pi-hotel-lists').html(hotels);
+                  }
+                }
+              });
             }
           },
         });
@@ -546,8 +549,8 @@ $(function () {
   });
 
   if ($("#pi-map").length) {
-    initializeMap(PI_DATA.mapCoordinates);
-    // initGoogleMap(PI_DATA.mapCoordinates);
+    // initializeMap(PI_DATA.mapCoordinates);
+    initGoogleMap(PI_DATA.mapCoordinates);
   }
 
   /**  Check if Page is Single Hotel Page and Append Hotel ID**/
