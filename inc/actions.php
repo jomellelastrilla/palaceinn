@@ -123,8 +123,8 @@ add_action( 'elementor/query/pi_featured_hotels', 'pi_featured_hotels_function' 
 function pi_hotel_location_query_function(){
   if ( isset($_POST['lat']) &&  isset($_POST['lng'])) :
 
-    $user_lat = (float) sanitize_text_field($_POST['user_lat']);
-    $user_lng = (float) sanitize_text_field($_POST['user_lng']);
+    $user_lat = (float) sanitize_text_field($_POST['lat']);
+    $user_lng = (float) sanitize_text_field($_POST['lng']);
     
     // Build custom post type query with geospatial filter
     $args = array(
@@ -159,7 +159,8 @@ function pi_hotel_location_query_function(){
           $hotel_lng = (float) $hotel_coordinates[1];
 
           // Calculate distance between user and hotel coordinates (replace with your preferred formula)
-          $distance = haversineGreatCircleDistance($user_lat, $user_lng, $hotel_lat, $hotel_lng);
+          // $distance = haversineGreatCircleDistance($user_lat, $user_lng, $hotel_lat, $hotel_lng);
+          $distance = calculate_distance($user_lat, $user_lng, $hotel_lat, $hotel_lng);
 
           // Output your post content or other information here
           $featured_image_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
@@ -191,10 +192,22 @@ function pi_hotel_location_query_function(){
       usort($list, function($a, $b) {
         return $a['distance'] <=> $b['distance'];
       });
+
+
+      if (is_array($list)) { // Check if $list is actually an array
+        $i = 1;
+        foreach ($list as &$item) { // Iterate with reference
+            $item['order'] = $i;
+            $i++;
+        }
+      }
       
+
       ob_start();
-      foreach($list as $hotel):
-        get_template_part('sections/listings/card', 'null', array('hotel' => $hotel) ); 
+      $count = 1;
+      foreach($list as $hotel):        
+        get_template_part('sections/listings/card', 'null', array('hotel' => $hotel, 'order' => $count) ); 
+        $count++;
       endforeach;
       $content = ob_get_clean();
 
@@ -202,7 +215,7 @@ function pi_hotel_location_query_function(){
       wp_reset_postdata();
       
       // Send response containing hotel data (replace with your desired data structure)
-      wp_send_json_success($content);
+      wp_send_json_success(array('coordinates' => $list, 'hotels' => $content));
     }
   endif;
 }

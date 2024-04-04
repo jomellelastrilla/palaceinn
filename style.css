@@ -240,8 +240,15 @@ button.pi-book-now:focus{
   display: flex;
   flex-direction: column;
   justify-content:  center;
-  align-items:  center;
+  align-items:  center;  
+}
 
+.pi-hotel-item h3{
+  text-align: center;
+  text-transform: uppercase;
+  font-family: "Inter", Sans-serif;
+  font-size: 18px;
+  font-weight: 700;  
 }
 
 .pi-hotel-item img{
@@ -582,12 +589,14 @@ button.pi-book-now:focus{
 }
 
 .property .icon span {
-  position: absolute;
-  left: 10px;
+  position: absolute;  
   top: 12px;
   font-size: 14px;
   color: #FFFFFF;
   font-family: "Inter", Sans-serif;
+  display: block;
+  text-align: center;
+  width: 100%;
 }
 
 .property .featured-image {
@@ -634,6 +643,10 @@ button.pi-book-now:focus{
   font-size: 12px;
   color: #000000;
   margin-bottom: 5px;
+}
+
+.property .contact p a{
+  color: #000000;
 }
 .property .contact p:last-child{
   margin-bottom: 0;

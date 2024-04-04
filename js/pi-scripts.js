@@ -1,35 +1,10 @@
 var $ = jQuery.noConflict();
 
-function buildContent(property) {
-  const content = document.createElement("div");
 
-  content.classList.add("property");
-  content.innerHTML = `
-    <div class="icon">        
-        <img src="${property.map_pin}">
-        <span>${property.order}</span>
-    </div>
-    <div class="content">
-      <h3>${property.title}</h3>
-      <div class="featured-image">
-        <img src="${property.image}" alt="${property.title}}" width="" max-height="200px"/>
-      </div>
-      <div class="contacts">
-        <div class="contact">
-          <p class="address"><strong>Address:</strong> ${property.address}</p>   
-          <p class="phone"><strong>Phone:</strong> ${property.phone}</p>   
-        </div>
-        <div class="cta ${property.color}">
-          <a href="${property.link}">More Info</a>
-          <a href="${property.booking_url}" target="_blank">Book Now</a>
-        </div>
-      </div>
-    </div>
-    `;
-  return content;
-}
 
 function toggleHighlight(markerView, property) {
+
+  $('.property').removeClass('highlight');
   if (markerView.content.classList.contains("highlight")) {
     markerView.content.classList.remove("highlight");
     markerView.zIndex = null;
@@ -40,6 +15,12 @@ function toggleHighlight(markerView, property) {
 }
 
 
+function closePopUp(e) {
+  const className = `.hotel-${e}`;
+  document.querySelector(className).classList.remove('highlight');
+  console.log('className: ', `document.querySelector(${className}).classList.remove('highlight');`);  
+}
+
 
 
 
@@ -47,10 +28,147 @@ $(function () {
   /** Map Initialize  **/
 
   let map;
+  var markers = []; // Array to store markers
 
-  function centerMapOnCoordinates(lat, lng) {
-    const userLocation = new google.maps.LatLng(lat, lng); // Create a LatLng object
+  function buildContent(property) {
+    const content = document.createElement("div");
+  
+    content.classList.add('property');
+    content.classList.add('hotel-' + property.ID);
+    content.innerHTML = `
+      <div class="icon">        
+          <img src="${property.map_pin}">
+          <span>${property.order}</span>
+      </div>
+      <div class="content">
+        <a href="#" class="pi-pop-close"><i class="fa-solid fa-xmark"></i></a>
+        <h3><a href="${property.link}">Palace Inn ${property.title}</a></h3>
+        <div class="featured-image">
+          <img src="${property.image}" alt="${property.title}}" width="" max-height="200px"/>
+        </div>
+        <div class="contacts">
+          <div class="contact">
+            <p class="address"><strong>Address:</strong> ${property.address}</p>   
+            <p class="phone"><a href="#"><strong>Phone:</strong> ${property.phone}</a></p>   
+          </div>
+          <div class="cta ${property.color}">
+            <a href="${property.link}">More Info</a>
+            <a href="${property.booking_url}" target="_blank">Book Now</a>
+          </div>
+        </div>
+      </div>
+      `;
+
+
+    const closeIcon = content.querySelector(".pi-pop-close"); // Replace with your selector
+    if (closeIcon) {
+      closeIcon.addEventListener("click", (event) => {
+        event.stopPropagation(); // Prevent event bubbling to marker click listener
+        document.querySelector('.hotel-' +  property.ID).classList.remove('highlight');
+      });
+    }  
+    return content;
+  }
+
+  function closePopUp() {
+    console.log('close this one 2');
+  }
+  function centerMapOnCoordinates(lat, lng, verticalOffset = -0.05) {
+    // Adjust the latitude by adding the vertical offset
+    const adjustedLat = lat - verticalOffset;
+    const userLocation = new google.maps.LatLng(adjustedLat, lng); // Create a LatLng object
     map.setCenter(userLocation); // Set the map center to the user's coordinates
+  }
+
+  function getZoomLevelForRadius(map, radiusInMiles) {
+    // Conversion factor from miles to meters
+    const metersPerMile = 1609.34;
+  
+    // Calculate radius in meters
+    const radiusInMeters = radiusInMiles * metersPerMile;
+  
+    // Reference for Google Maps zoom level -> meters per pixel relationship (replace with your actual source)
+    const zoomLevelPixelRelationship = {
+      // Example values, you might need to adjust these based on your map tiles
+      20: 0.000015625,
+      19: 0.00003125,
+      18: 0.0000625,
+      17: 0.000125,
+      16: 0.00025,
+      // ... add more zoom levels and their corresponding meters per pixel values
+    };
+  
+    // Find the closest zoom level where meters per pixel is less than or equal to radius in meters
+    let closestZoomLevel;
+    for (const zoomLevel in zoomLevelPixelRelationship) {
+      const metersPerPixel = zoomLevelPixelRelationship[zoomLevel];
+      if (metersPerPixel <= radiusInMeters) {
+        closestZoomLevel = parseInt(zoomLevel);
+        break;
+      }
+    }
+  
+    // Ensure a valid zoom level is found
+    if (!closestZoomLevel) {
+      console.warn("Zoom level not found for radius", radiusInMiles, "miles");
+      return null;
+    }
+  
+    // Set the map zoom level
+    map.setZoom(closestZoomLevel);
+  
+    return closestZoomLevel;
+  }
+
+
+  function clearMarkers(markers) {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+    }
+    markers = [];
+  }
+
+  async function updateGoogleMapPins(hotels){   
+
+    clearMarkers(markers);
+
+    const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
+
+    
+    $.each(hotels, function(index, hotel) {
+  
+      const pin = new PinElement({
+        glyph: `${hotel.order}`,
+      });
+
+     var coordinates = hotel.coordinates.split(",").map(function (coord) {
+       return parseFloat(coord.trim());
+     });
+
+     const marker = new AdvancedMarkerElement({
+        position: { lat: coordinates[0], lng: coordinates[1] },
+        map: map,
+        content: buildContent(hotel),
+        title: hotel.title
+      });
+
+      marker.addListener('click', ({ domEvent, latLng }) => {
+        
+        toggleHighlight(marker, hotel);
+
+        $('.pi-pop-close').each(function(){
+          $(this).on('click', function(e){
+            e.preventDefault();
+            $('.property').removeClass('highlight');
+          });
+        });
+        // const { target } = domEvent;
+
+        // infoWindow.close();
+        // infoWindow.setContent(marker.title);
+        // infoWindow.open(marker.map, marker);
+      });
+  });
   }
 
   async function initGoogleMap(){
@@ -96,16 +214,23 @@ $(function () {
             title: hotel.title
         });
   
-        marker.addListener('click', ({ domEvent, latLng }) => {
+        marker.addListener('click', ({ domEvent, latLng }) => {          
+          centerMapOnCoordinates(latLng.lat(), latLng.lng())          
           toggleHighlight(marker, hotel);
-          // const { target } = domEvent;
-  
-          // infoWindow.close();
-          // infoWindow.setContent(marker.title);
-          // infoWindow.open(marker.map, marker);
+          
         });
+        
+
+        markers.push(marker);
     });
-   
+    $('.pi-pop-close').each(function(){
+
+      $(this).on('click', function(e){
+        e.preventDefault();
+        console.log('pop clicked')
+        $('.property').removeClass('highlight');
+      });
+    });
   }
 
   function parse_area_booking_data($container) {
@@ -274,6 +399,13 @@ $(function () {
       return zoomLevel;
     } catch (error) {
       console.error("Error calculating zoom level:", error);
+    }
+  }
+
+
+  function clearMarkers(markers) {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
     }
   }
 
@@ -509,11 +641,13 @@ $(function () {
                 success: function ({ data, success }) {
                   if (success){
 
-                    let hotels = data;
+                    let hotels = data.hotels;
 
                    
                     $('.pi-hotel-lists').empty();
                     $('.pi-hotel-lists').html(hotels);
+
+                    updateGoogleMapPins(data.coordinates);
                   }
                 }
               });
@@ -535,8 +669,10 @@ $(function () {
         const latLng = [parseFloat(coordinates[0]), parseFloat(coordinates[1])];
 
         try {
-          const zoomLevel = calculateZoomLevel(map, latLng, miles);
-          map.setView(latLng, zoomLevel);
+          // const zoomLevel = calculateZoomLevel(map, latLng, miles);
+          // map.setView(latLng, zoomLevel);
+         const zoomLevel =  getZoomLevelForRadius(map, miles)
+          map.setZoom(zoomLevel)
         } catch (error) {
           console.error("Error calculating zoom level:", error);
         }
@@ -548,9 +684,13 @@ $(function () {
     });
   });
 
-  if ($("#pi-map").length) {
+  if ($("#pi-map2").length) {
     // initializeMap(PI_DATA.mapCoordinates);
     initGoogleMap(PI_DATA.mapCoordinates);
+    $('#pi-map2').on('click', function(e){
+      e.preventDefault();
+      // $('.property').removeClass('highlight');
+    });
   }
 
   /**  Check if Page is Single Hotel Page and Append Hotel ID**/
@@ -619,4 +759,7 @@ $(function () {
           }
       });
   }
+
+  
+  
 });

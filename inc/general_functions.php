@@ -201,4 +201,24 @@ function haversineGreatCircleDistance($latitudeFrom, $longitudeFrom, $latitudeTo
   return $earthRadius * $c;
 }
 
+function calculate_distance($lat1, $lon1, $lat2, $lon2, $unit = 'mi') {
+  // Convert latitude and longitude from degrees to radians
+  $lat1 = deg2rad($lat1);
+  $lon1 = deg2rad($lon1);
+  $lat2 = deg2rad($lat2);
+  $lon2 = deg2rad($lon2);
+
+  // Radius of the Earth in the chosen unit (default is miles)
+  $radius = ($unit == 'km') ? 6371 : 3959;
+
+  // Haversine formula
+  $delta_lat = $lat2 - $lat1;
+  $delta_lon = $lon2 - $lon1;
+  $a = sin($delta_lat / 2) * sin($delta_lat / 2) + cos($lat1) * cos($lat2) * sin($delta_lon / 2) * sin($delta_lon / 2);
+  $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+  $distance = $radius * $c;
+
+  return $distance;
+}
+
 ?>
