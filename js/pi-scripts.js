@@ -69,10 +69,7 @@ $(function () {
     }  
     return content;
   }
-
-  function closePopUp() {
-    console.log('close this one 2');
-  }
+  
   function centerMapOnCoordinates(lat, lng, verticalOffset = -0.05) {
     // Adjust the latitude by adding the vertical offset
     const adjustedLat = lat - verticalOffset;
@@ -409,6 +406,28 @@ $(function () {
     }
   }
 
+  function getLatLngBounds(distanceInMeters) {
+    var center = map.getCenter();
+    var radius = distanceInMeters / 2; // Half the distance for each direction
+
+    // Create LatLngBounds object representing the desired area
+    var bounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(center.lat() - radius / 111132, center.lng() - radius / (111132 * Math.cos(center.lat() * Math.PI / 180))),
+      new google.maps.LatLng(center.lat() + radius / 111132, center.lng() + radius / (111132 * Math.cos(center.lat() * Math.PI / 180)))
+    );
+
+    return bounds;
+  }
+
+  function setZoomToBounds(bounds) {
+    var minZoom = 2; // Set your desired minimum zoom level (adjust as needed)
+    map.fitBounds(bounds, {
+      padding: 20, // Add some padding for aesthetics (optional)
+      maxZoom: map.getZoom(), // Prevent zoom beyond current level
+      minZoom: minZoom
+    });
+  }
+
   if ($("#pi-map").length) {
     // const initialCoordinates = [29.76035220031458, -95.3665050615942];
 
@@ -473,7 +492,7 @@ $(function () {
     });
   });
 
-  // Set up Flatpickr for .pi-checkout using jQuery
+  /** Set up Flatpickr for .pi-checkout using jQuery
 
   $(".pi-checkout").each(function () {
     // Calculate tomorrow's date
@@ -671,8 +690,8 @@ $(function () {
         try {
           // const zoomLevel = calculateZoomLevel(map, latLng, miles);
           // map.setView(latLng, zoomLevel);
-         const zoomLevel =  getZoomLevelForRadius(map, miles)
-          map.setZoom(zoomLevel)
+          console.log(parseFloat(miles * 1609.34));
+          setZoomToBounds(getLatLngBounds(parseFloat(miles * 1609.34)));
         } catch (error) {
           console.error("Error calculating zoom level:", error);
         }

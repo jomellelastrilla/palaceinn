@@ -230,7 +230,17 @@ button.pi-book-now:focus{
   margin: 0;
   position: relative;
   margin-bottom: 50px;
+
+  @media screen and (max-width: 1024px){
+    grid-template-columns: repeat(2, 1fr); /* 4 equal-width columns */
+  }
+  
+  @media screen and (max-width: 767px){
+    grid-template-columns: repeat(1, 1fr); /* 4 equal-width columns */
+  }
 }
+
+
 
 .pi-hotel-item {
   box-sizing: border-box;
@@ -241,6 +251,37 @@ button.pi-book-now:focus{
   flex-direction: column;
   justify-content:  center;
   align-items:  center;  
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+.pi-hotel-item .order{
+  font-family: "Inter", Sans-serif;
+  font-size: 12px;
+  color: #FFFFFF;
+  font-weight: 400;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 0 1px;
+  width: 21px;
+  line-height: 20px;
+  text-align: center;
+  z-index: 0;
+}
+
+.pi-hotel-item .order::after{
+  content: "";
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  right: -25px;
+  top: -26px;
+  z-index: -1;
+  transform: rotate(45deg);
+  background-color: var(--pi-color, "#002D9F");
 }
 
 .pi-hotel-item h3{
@@ -251,6 +292,10 @@ button.pi-book-now:focus{
   font-weight: 700;  
 }
 
+.pi-hotel-item .pi-featured-image{
+  width: 100%;
+  height: 240px;
+}
 .pi-hotel-item img{
   width: 100%;
   height: 240px;
@@ -258,7 +303,23 @@ button.pi-book-now:focus{
   object-position: center;
 }
 
+.pi-hotel-item .price{
+  color: #000000;
+  font-family: "Inter", Sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.pi-hotel-item .price span{
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 24px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
 .pi-hotel-item.red h3,
+.pi-hotel-item.red h3 a,
 .pi-hotel-item.red .price span,
 .pi-hotel-item.red .pi-actions .more-info{
   color: var( --e-global-color-e55f62f );
@@ -266,11 +327,19 @@ button.pi-book-now:focus{
 
 
 .pi-hotel-item.blue h3,
+.pi-hotel-item.blue h3 a,
 .pi-hotel-item.blue .price span,
 .pi-hotel-item.blue .pi-actions .more-info{
   color: var( --e-global-color-59ce220);
 }
 
+.pi-hotel-item.red{
+  border-color: var( --e-global-color-e55f62f );
+}
+
+.pi-hotel-item.blue{
+  border-color: var( --e-global-color-59ce220);
+}
 
 .pi-more-info{
   background-color: #F4F4F4;
@@ -279,6 +348,24 @@ button.pi-book-now:focus{
   justify-content: center;
   row-gap: 20px;
   padding: 30px;
+  width: 100%;
+  align-items: center;
+}
+
+.pi-location{
+  color: #000000;
+  font-family: "Inter", Sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: center;
+}
+
+.pi-contact-number{
+  font-family: "Inter", Sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #000000;
 }
 
 .pi-actions {
@@ -287,7 +374,65 @@ button.pi-book-now:focus{
   row-gap: 10px;
   justify-items: center;
   padding: 0px 55px;
+  text-align: center;
+
+  @media screen and (max-width: 1024px){
+    padding: 0 10px; 
+  }
+  
+  @media screen and (max-width: 767px){    
+      padding: 0;    
+  }
 }
+
+
+
+.pi-actions .book-now{
+  width: 100%;
+  color: #FFFFFF;
+  font-family: "Inter", Sans-serif;
+  font-size: 16px;
+  font-weight: 400; 
+  padding: 10px 27px 10px 27px;
+}
+
+.pi-hotel-item.blue .pi-actions .book-now{
+  background-color: var(--pi-color, #002D9F);
+  border: 1px solid var(--pi-color, #002D9F);
+}
+
+.pi-hotel-item.red .pi-actions .book-now{
+  background-color: var(--pi-color, #AC0007);
+  border: 1px solid var(--pi-color, #AC0007);
+}
+
+.pi-actions .more-info{
+  width: 100%;
+  font-family: "Inter", Sans-serif;
+  font-size: 16px;
+  font-weight: 400; 
+  padding: 10px 27px 10px 27px;
+  text-align: center;  
+  transition: all .3s;
+}
+
+.pi-hotel-item.red .pi-actions .more-info{
+  border: 1px solid #AC0007;
+}
+.pi-hotel-item.blue .pi-actions .more-info{
+  border: 1px solid #002D9F;
+}
+
+.pi-hotel-item.red .pi-actions .more-info:hover{
+  background-color:  #AC0007;
+  color: #FFFFFF !important;
+}
+
+.pi-hotel-item.blue .pi-actions .more-info:hover{
+  background-color:  #002D9F;
+  color: #FFFFFF !important;
+}
+
 
 /* Hotel Booking Widget */
 
