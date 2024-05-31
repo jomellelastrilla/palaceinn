@@ -22,6 +22,14 @@ $(function () {
   var markers = []; // Array to store markers
 
 
+function centerToDefault(){
+  // Specify the coordinates where you want the map to be centered
+  var centerCoordinates =  { lat: 29.76035220031458, lng: -95.3665050615942};
+  $('#pi-address').attr('data-coordinates', '29.76035220031458' + ',' + -95.3665050615942);
+
+  centerMapOnCoordinates(centerCoordinates.lat, centerCoordinates.lng, 0);
+}
+
 function location_not_found(){
   const $content = $('<div>').addClass('pi-not-found hide');
 
@@ -203,7 +211,10 @@ function location_not_found(){
   }
 
   
-  async function updateGoogleMapPins(hotels){   
+  async function updateGoogleMapPins(hotels, initialize = false){   
+
+
+    var bounds = new google.maps.LatLngBounds();
 
     clearMarkers(markers);
 
@@ -235,8 +246,17 @@ function location_not_found(){
         map.panTo(latLng); // Center the map around the clicked marker with an offset
         map.panBy(0, mapContainer.offsetHeight * -0.325);            
       });
+
+       // Add marker to bounds
+       bounds.extend(marker.position);
+       markers.push(marker);
     });
+
+    if (initialize){
+      map.fitBounds(bounds);
+    }
   }
+
 
   async function initGoogleMap(){
 
@@ -760,7 +780,7 @@ function location_not_found(){
       minLength: 3,
       select: function (event, ui) {
         const selectedAddress = ui.item.value;
-
+        
         $.ajax({
           url: PI_DATA.ajaxMapUrl,
           type: "GET",
@@ -773,11 +793,16 @@ function location_not_found(){
             if (success) {
               const latLng = [data.lat, data.lng];
 
+              // Reset Miles to 5 Miles
+              $('#miles a').removeClass('active');
+              $('#miles a[data-miles="15"').addClass('active');
+          
+
               $address.attr("data-coordinates", latLng);
 
               // Update Leaflet map center
               const miles = parseInt($("#miles a.active").data("miles"));
-              const radiusInMeters = 15 * 1609.34; 
+              const radiusInMeters = miles * 1609.34; 
 
               const user_lat = data.lat;
               const user_lang = data.lng;
@@ -857,18 +882,25 @@ function location_not_found(){
                       return distance <= radiusInMeters;
                     });
 
-                    console.log('hotel with radius', hotelsWithinRadius);
+                    // console.log('hotel with radius', hotelsWithinRadius);
                     if (hotelsWithinRadius.length === 0) {
                       $('.pi-not-found').removeClass('hide');
-                      console.log("No hotels found within a 15-mile radius.");
+                      updateGoogleMapPins(PI_DATA.mapCoordinates, true);
+                      // centerMapOnCoordinates(29.76035220031458, -95.3665050615942);
+
+                      
+                      // console.log("No hotels found within a 15-mile radius.");
+                      
                     } else{
                       $('.pi-not-found').addClass('hide');
+                      $('.pi-hotel-lists').empty();
+                      $('.pi-hotel-lists').html(hotels);
+
+                      // console.log(data.coordinates);
+                      updateGoogleMapPins(data.coordinates);
                     }
 
-                    $('.pi-hotel-lists').empty();
-                    $('.pi-hotel-lists').html(hotels);
-
-                    updateGoogleMapPins(data.coordinates);
+                    
                  
                   }
                 }
