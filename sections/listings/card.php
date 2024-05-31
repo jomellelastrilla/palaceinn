@@ -1,23 +1,13 @@
-<?php 
-  $hotel = $args['hotel'];
-  $order = $args['order'];
-?>
-
-<div class="pi-hotel-item pi-color-code-<?= $hotel['color']; ?> <?= $hotel['color']; ?>" data-distance="<?= $hotel['distance']; ?>">
-  <span class="order"><?= $order; ?></span>
-  <h3>
-    <a href="<?= $hotel['link']; ?>">Palace Inn<?= $hotel['title']; ?></a>
-  </h3>
-  <p class="price">Rates Starting from <span>$<?= $hotel['starting_price']; ?></span></p>
-  <a class="pi-featured-image"href="<?= $hotel['link']; ?>">
-    <img src="<?= $hotel['image']; ?>"/>
-  </a>
+<div class="pi-hotel-item">
+  <h3>Title</h3>
+  <p class="price">Rates Starting from <span>$85</span></p>
+  <img class="pi-featured-image" src="https://placehold.co/330x240?text=Hotel+Image"/>
   <div class="pi-more-info">
-    <p class="pi-location"><?= $hotel['address']; ?></p>
-    <a href="tel:<?= $hotel['phone']; ?>" class="pi-contact-number"><i class="fas fa-phone"></i> <?= $hotel['phone']; ?></a>
+    <p class="pi-address">8778 Gateway Blvd. E, El Paso, Texas 79907</p>
+    <a href="tel:+502-8778" class="pi-contact-number"><i class="fas fa-phone"></i> 502-8778</a>
     <div class="pi-actions">
-      <a href="<?= $hotel['link']; ?>" class="more-info">More Info</a>
-      <a href="<?= $hotel['booking_url']; ?>" class="book-now">Book Now</a>
+      <button href="#" class="more-info">More Info</button>
+      <button href="#" class="book-now">Book Now</button>
     </div>
   </div>
 </div>

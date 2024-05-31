@@ -186,16 +186,3 @@ function pi_hotel_order_number_function(){
 }
 
 add_shortcode('pi_hotel_order_number','pi_hotel_order_number_function');
-
-
-function pi_hotel_lists_function() {
-  ob_start();
-
-  get_template_part('sections/listings/lists' , null, array('hotels' => pi_hotel_map_places()));
-  $content = ob_get_clean();
-
-  return $content;
-}
-
-
-add_shortcode('pi_hotel_lists', 'pi_hotel_lists_function');
