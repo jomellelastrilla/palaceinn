@@ -119,4 +119,109 @@ function pi_featured_hotels_function( $query ) {
 }
 add_action( 'elementor/query/pi_featured_hotels', 'pi_featured_hotels_function' );
 
+
+function pi_hotel_location_query_function(){
+  if ( isset($_POST['lat']) &&  isset($_POST['lng'])) :
+
+    $user_lat = (float) sanitize_text_field($_POST['lat']);
+    $user_lng = (float) sanitize_text_field($_POST['lng']);
+    
+    // Build custom post type query with geospatial filter
+    $args = array(
+      'post_type' => 'hotels', // Replace with your custom post type slug
+      'post_status'    => 'publish',
+      'posts_per_page' => -1, // Get all hotels
+      'meta_query' => array(
+        array(
+          'key' => 'coordinates', // Replace with your ACF field name
+          'compare' => 'EXISTS'
+        )
+      ),
+      'orderby' => array(
+        'meta_value_num' => 'ASC', // Order by distance (replace with your distance calculation logic)
+      )
+    );
+
+    $query = new WP_Query($args);
+    // Extract coordinates from ACF field (replace with your logic)
+    if ($query->have_posts()) {
+      $list = array();
+      $order = 1;
+      while ($query->have_posts()) {
+        $query->the_post();
+        $hotel_id = get_the_ID();
+        $hotel_coordinates_string = get_field('coordinates', $hotel_id); // Replace with your ACF field retrieval code
+        $hotel_coordinates = explode(", ", $hotel_coordinates_string);
+
+        // Ensure we have valid coordinates
+        //if (count($hotel_coordinates) === 2) {
+          $hotel_lat = (float) $hotel_coordinates[0];
+          $hotel_lng = (float) $hotel_coordinates[1];
+
+          // Calculate distance between user and hotel coordinates (replace with your preferred formula)
+          // $distance = haversineGreatCircleDistance($user_lat, $user_lng, $hotel_lat, $hotel_lng);
+          $distance = calculate_distance($user_lat, $user_lng, $hotel_lat, $hotel_lng);
+
+          // Output your post content or other information here
+          $featured_image_url = get_the_post_thumbnail_url( get_the_ID(), 'full' );
+          $color_code = pi_color_code_text(get_field('color_code'));
+
+          array_push($list, array(
+            'ID'          => get_the_ID(),
+            'title'       => esc_html(get_the_title()),
+            'image'       => esc_url( $featured_image_url ),
+            'link'        => get_permalink(),
+            'address'     => get_field('address'),
+            'booking_url' => 'https://book.palaceinn.com/?hotel=' . get_field('hotel_id'),
+            'coordinates' => get_field('coordinates'),
+            'color'       => $color_code,
+            'map_pin'     => site_url('/wp-content/themes/hello-theme-child/assets/' . $color_code . '-marker-plain.png'),
+            'phone'       => get_field('contact_number'),
+            'order'       => $order,
+            'starting_price'=> get_field('staring_price'),
+            'distance' => $distance
+          ));
+          $order++;
+          
+        // }
+        
+      }
+
+
+      // Sort hotels by distance (ascending)
+      usort($list, function($a, $b) {
+        return $a['distance'] <=> $b['distance'];
+      });
+
+
+      if (is_array($list)) { // Check if $list is actually an array
+        $i = 1;
+        foreach ($list as &$item) { // Iterate with reference
+            $item['order'] = $i;
+            $i++;
+        }
+      }
+      
+
+      ob_start();
+      $count = 1;
+      foreach($list as $hotel):        
+        get_template_part('sections/listings/card', 'null', array('hotel' => $hotel, 'order' => $count) ); 
+        $count++;
+      endforeach;
+      $content = ob_get_clean();
+
+      
+      wp_reset_postdata();
+      
+      // Send response containing hotel data (replace with your desired data structure)
+      wp_send_json_success(array('coordinates' => $list, 'hotels' => $content, 'lists' => $list));
+    }
+  endif;
+}
+
+// Register the AJAX action for location query
+add_action('wp_ajax_pi_hotel_location_query', 'pi_hotel_location_query_function');
+add_action('wp_ajax_nopriv_pi_hotel_location_query', 'pi_hotel_location_query_function');
+
 ?>

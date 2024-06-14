@@ -5,7 +5,7 @@
     <span class="pi-datepicker-icon"><i class="fas fa-solid fa-calendar-days"></i></span>
   </div>
   <div class="pi-hotel-field">
-  <label for="pi-checkout">Check Out</label>
+  <label for="pi-checkout">Checkout</label>
     <input type="text" class="pi-datepicker pi-checkout" placeholder="MM-DD-YYYY" id="pi-checkout" name="pi-checkout" readonly="readonly" />
     <span class="pi-datepicker-icon"><i class="fas fa-solid fa-calendar-days"></i></span>
   </div>

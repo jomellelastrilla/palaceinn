@@ -75,7 +75,8 @@ function pi_hotel_map_places() {
             'color'       => $color_code,
             'map_pin'     => site_url('/wp-content/themes/hello-theme-child/assets/' . $color_code . '-marker-plain.png'),
             'phone'       => get_field('contact_number'),
-            'order'       => $order
+            'order'       => $order,
+            'starting_price'=> get_field('staring_price')
           ));
           $order++;
       }     
@@ -180,4 +181,44 @@ function pi_get_user_coordinates() {
       return null;
   }
 }
+
+function haversineGreatCircleDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo, $earthRadius = 6371000) {
+  // Convert degrees to radians
+  $latFromRad = deg2rad($latitudeFrom);
+  $lonFromRad = deg2rad($longitudeFrom);
+  $latToRad = deg2rad($latitudeTo);
+  $lonToRad = deg2rad($longitudeTo);
+
+  $latDelta = $latToRad - $latFromRad;
+  $lonDelta = $lonToRad - $lonFromRad;
+
+  $a = sin($latDelta / 2) * sin($latDelta / 2) +
+      cos($latFromRad) * cos($latToRad) *
+      sin($lonDelta / 2) * sin($lonDelta / 2);
+
+  $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+  return $earthRadius * $c;
+}
+
+function calculate_distance($lat1, $lon1, $lat2, $lon2, $unit = 'mi') {
+  // Convert latitude and longitude from degrees to radians
+  $lat1 = deg2rad($lat1);
+  $lon1 = deg2rad($lon1);
+  $lat2 = deg2rad($lat2);
+  $lon2 = deg2rad($lon2);
+
+  // Radius of the Earth in the chosen unit (default is miles)
+  $radius = ($unit == 'km') ? 6371 : 3959;
+
+  // Haversine formula
+  $delta_lat = $lat2 - $lat1;
+  $delta_lon = $lon2 - $lon1;
+  $a = sin($delta_lat / 2) * sin($delta_lat / 2) + cos($lat1) * cos($lat2) * sin($delta_lon / 2) * sin($delta_lon / 2);
+  $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+  $distance = $radius * $c;
+
+  return $distance;
+}
+
 ?>
