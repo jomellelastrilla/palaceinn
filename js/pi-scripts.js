@@ -292,12 +292,46 @@ function location_not_found(){
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
+          
+
+          // Create a user marker object
+          const userMarker = new google.maps.Marker({
+            position: pos,
+            map: map, // Reference your existing map object here
+            title: "Your Location", // Optional title for the marker
+            icon: { // Optional custom icon for the user pin
+              url: PI_DATA.user_icon,
+              scaledSize: new google.maps.Size(37, 56), // Adjust icon size as needed
+            },
+          });
+
+
+          // let userMarker = new google.maps.marker.AdvancedMarkerElement({
+          //   position: pos,
+          //   map: map,            
+          //   content: PI_DATA.user_icon         
+          // });
+
+           // Set the map center to the user's location
+           map.setCenter(pos);
 
           $('#pi-address').attr('data-coordinates', position.coords.latitude + ',' + position.coords.longitude);
           infoWindow.setPosition(pos);
           infoWindow.setContent("Location found.");
           // infoWindow.open(map);
-          map.setCenter(pos);
+
+         
+
+          const radiusInMeters = parseFloat(5 * 1609.34); // Convert miles to meters (conversion factor: 1 mile = 1609.34 meters)
+          const circle = new google.maps.Circle({
+            center: pos,
+            radius: radiusInMeters,
+          });
+      
+          // Fit the map to the bounds of the circle (including some padding)
+          map.fitBounds(circle.getBounds(), {
+            padding: 50, // Adjust padding as needed (in pixels)
+          });
         },
         () => {          
           handleLocationError(true, infoWindow, map.getCenter());
@@ -305,7 +339,7 @@ function location_not_found(){
       );
     } else {
       
-      // handleLocationError(true, infoWindow, map.getCenter());
+      handleLocationError(true, infoWindow, map.getCenter());
     }
     
  
@@ -549,57 +583,32 @@ function location_not_found(){
     });
   }
 
-  if ($("#pi-map").length) {
-    // const initialCoordinates = [29.76035220031458, -95.3665050615942];
 
-    // var map = L.map("pi-map").setView(initialCoordinates, 13);
-    // // Add Google Maps as a tile layer
-    // L.tileLayer("https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
-    //   maxZoom: 17,
-    //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
-    //   attributionControl: false, // Disable the default attribution control
-    // }).addTo(map);
-
-    // map.scrollWheelZoom.disable();
-
-    // map.attributionControl.remove();
-
-    // $("#pi-map").on("wheel", function (e) {
-    //   if (!e.ctrlKey) {
-    //     map.scrollWheelZoom.disable();
-    //     $(".pi-map-overlay").removeClass("hide");
-    //   } else {
-    //     map.scrollWheelZoom.enable();
-    //     $(".pi-map-overlay").addClass("hide");
-    //   }
-    // });
-
-    // $("#pi-map").on("touchstart", function (e) {
-    //   if (e.originalEvent.touches.length > 1) {
-    //     map.touchZoom.enable();
-    //     map.scrollWheelZoom.enable();
-    //     $(".pi-map-overlay").addClass("hide");
-    //   } else {
-    //     map.touchZoom.disable();
-    //     map.scrollWheelZoom.disable();
-    //     $(".pi-map-overlay").removeClass("hide");
-    //   }
-    // });
-
-    // Listen for wheel event on the map container
-    // $(map.getContainer()).on('wheel', function(event) {
-    //   // Show the overlay
-    //   $('.pi-map-overlay').removeClass('hide');
-    //   $('.pi-map-overlay').fadeIn();
-    //   map.scrollWheelZoom.disable();
-
-    //   // Hide the overlay after a delay
-    //   setTimeout(function() {
-    //       $('.pi-map-overlay').fadeOut();
-    //   }, 1000); // 300 milliseconds delay (adjust as needed)
-    // });
+  function haversineGreatCircleDistance(latitudeFrom, longitudeFrom, latitudeTo, longitudeTo, earthRadius = 6371000) {
+    // Convert degrees to radians
+    const latFromRad = Math.PI * latitudeFrom / 180;
+    const lonFromRad = Math.PI * longitudeFrom / 180;
+    const latToRad = Math.PI * latitudeTo / 180;
+    const lonToRad = Math.PI * longitudeTo / 180;
+  
+    const latDelta = latToRad - latFromRad;
+    const lonDelta = lonToRad - lonFromRad;
+  
+    const a = Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+        Math.cos(latFromRad) * Math.cos(latToRad) *
+        Math.sin(lonDelta / 2) * Math.sin(lonDelta / 2);
+  
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  
+    return earthRadius * c;
+  }
+  
+  // Helper function to convert degrees to radians
+  function radians(degrees) {
+    return degrees * Math.PI / 180;
   }
 
+  
   /** DatePicker Filter **/
 
   $(".pi-checkin").each(function () {
@@ -795,7 +804,7 @@ function location_not_found(){
 
               // Reset Miles to 5 Miles
               $('#miles a').removeClass('active');
-              $('#miles a[data-miles="15"').addClass('active');
+              $('#miles a[data-miles="5"').addClass('active');
           
 
               $address.attr("data-coordinates", latLng);
@@ -826,51 +835,18 @@ function location_not_found(){
                   if (success){
 
                     let hotels = data.hotels;
-                    // Implement your distance calculation function here (Haversine formula or Geolocation API)
-                    function calculateDistance(point1, point2) {
-                      const R = 6371e3; // Earth's radius in meters
-                    
-                      const lat1 = radians(point1[0]);
-                      const lng1 = radians(point1[1]);
-                      const lat2 = radians(point2[0]);
-                      const lng2 = radians(point2[1]);
-                    
-                      const dLat = lat2 - lat1;
-                      const dLon = lng2 - lng1;
-                    
-                      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                                Math.cos(lat1) * Math.cos(lat2) *
-                                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                    
-                      const distance = R * c;
-                    
-                      return distance;
-                    }
+                    // Create a user marker object
+                    const userMarker = new google.maps.Marker({
+                      position: {lat: user_lat, lng: user_lang },
+                      map: map, // Reference your existing map object here
+                      title: "Your Location", // Optional title for the marker
+                      icon: { // Optional custom icon for the user pin
+                        url: PI_DATA.user_icon,
+                        scaledSize: new google.maps.Size(37, 56), // Adjust icon size as needed
+                      },
+                    });
 
-                    function haversineGreatCircleDistance(latitudeFrom, longitudeFrom, latitudeTo, longitudeTo, earthRadius = 6371000) {
-                      // Convert degrees to radians
-                      const latFromRad = Math.PI * latitudeFrom / 180;
-                      const lonFromRad = Math.PI * longitudeFrom / 180;
-                      const latToRad = Math.PI * latitudeTo / 180;
-                      const lonToRad = Math.PI * longitudeTo / 180;
                     
-                      const latDelta = latToRad - latFromRad;
-                      const lonDelta = lonToRad - lonFromRad;
-                    
-                      const a = Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
-                          Math.cos(latFromRad) * Math.cos(latToRad) *
-                          Math.sin(lonDelta / 2) * Math.sin(lonDelta / 2);
-                    
-                      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                    
-                      return earthRadius * c;
-                    }
-                    
-                    // Helper function to convert degrees to radians
-                    function radians(degrees) {
-                      return degrees * Math.PI / 180;
-                    }
 
                     let hotelsWithinRadius = data.lists.filter(function (hotel) {
                       var coords = hotel.coordinates.split(",").map(function (coord) {

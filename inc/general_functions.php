@@ -8,6 +8,8 @@ function pi_localize_scripts() {
     'mapCoordinates'        => pi_hotel_map_places(),
     'user_coordinates'      => pi_get_user_coordinates(),
     'user_ip'               => $_SERVER['REMOTE_ADDR'],
+    'site_url'              => get_site_url(),
+    'user_icon'             => site_url('wp-content/themes/hello-theme-child/assets/user-location-marker.png')
   );
 
 
