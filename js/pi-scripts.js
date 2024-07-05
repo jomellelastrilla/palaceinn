@@ -210,6 +210,134 @@ function location_not_found(){
     // $('.pi-not-found').removeClass('hide');
   }
 
+  function showAllPins(){
+    $('#pi-map2').append(location_not_found());
+    // Create a new bounds object outside the loop
+    var bounds = new google.maps.LatLngBounds();
+    var hotels = PI_DATA.mapCoordinates;
+ 
+    // Loop through the locations array to create map pins
+    $.each(hotels, function(index, hotel) {
+        const pin = new PinElement({
+          glyph: `${hotel.order}`,
+        });
+  
+       var coordinates = hotel.coordinates.split(",").map(function (coord) {
+         return parseFloat(coord.trim());
+       });
+  
+       
+  
+        let marker = new AdvancedMarkerElement({
+            position: { lat: coordinates[0], lng: coordinates[1] },
+            map: map,            
+            title: hotel.title            
+        });
+
+        marker.content = buildContent(hotel, marker);
+  
+        marker.addListener('click', ({ domEvent, latLng }) => {          
+          // centerMapOnCoordinates(latLng.lat(), latLng.lng()) 
+          var mapContainer = map.getDiv();         
+          toggleHighlight(marker, hotel);
+          map.panTo(latLng); // Center the map around the clicked marker with an offset
+          map.panBy(0, mapContainer.offsetHeight * -0.325);
+        });
+        
+
+        // Add marker to bounds
+        bounds.extend(marker.position);
+        markers.push(marker);
+    });
+
+    map.fitBounds(bounds);
+  }
+
+  function showNearbyPlaces(lat, lng){
+    $('#pi-map2').append(location_not_found());
+    const latLng = [lat, lng];
+    $address = $('.pi-address');
+
+    // Reset Miles to 5 Miles
+    $('#miles a').removeClass('active');
+    $('#miles a[data-miles="5"').addClass('active');
+
+
+    $address.attr("data-coordinates", latLng);
+
+    // Update Leaflet map center
+    const miles = parseInt($("#miles a.active").data("miles"));
+    const radiusInMeters = miles * 1609.34; 
+
+    const user_lat = lat;
+    const user_lang =lng;
+
+    
+    // const zoomLevel = calculateZoomLevel(map, latLng, miles);
+
+    setZoomToBounds(getLatLngBounds(parseFloat(miles * 1609.34)));
+    centerMapOnCoordinates(lat, lng, 0);
+    // map.setView(latLng, zoomLevel);
+    $.ajax({
+      url: PI_DATA.ajaxMapUrl,
+      type: 'POST',
+      dataType: "json",
+      data: {
+        action: 'pi_hotel_location_query',
+        lat: lat,
+        lng: lng
+      },
+      success: function ({ data, success }) {
+        if (success){
+
+          let hotels = data.hotels;
+          // Create a user marker object
+          const userMarker = new google.maps.Marker({
+            position: {lat: user_lat, lng: user_lang },
+            map: map, // Reference your existing map object here
+            title: "Your Location", // Optional title for the marker
+            icon: { // Optional custom icon for the user pin
+              url: PI_DATA.user_icon,
+              scaledSize: new google.maps.Size(37, 56), // Adjust icon size as needed
+            },
+          });
+
+          
+          let hotelsWithinRadius = data.lists.filter(function (hotel) {
+            var coords = hotel.coordinates.split(",").map(function (coord) {
+              return parseFloat(coord.trim());
+            });                     
+
+            // const distance = calculateDistance(coords[0], coords[1]);
+            const distance  = haversineGreatCircleDistance(coords[0], coords[1], user_lat, user_lang);
+            return distance <= radiusInMeters;
+          });
+
+          // console.log('hotel with radius', hotelsWithinRadius);
+          if (hotelsWithinRadius.length === 0) {
+            $('.pi-not-found').removeClass('hide');
+            updateGoogleMapPins(PI_DATA.mapCoordinates, true);
+            // centerMapOnCoordinates(29.76035220031458, -95.3665050615942);
+
+            
+            // console.log("No hotels found within a 15-mile radius.");
+            $('.pi-not-found').removeClass('hide');
+            
+          } else{
+            $('.pi-not-found').addClass('hide');
+            $('.pi-hotel-lists').empty();
+            $('.pi-hotel-lists').html(hotels);
+
+            // console.log(data.coordinates);
+            updateGoogleMapPins(data.coordinates);
+          }                    
+        
+        }
+      }
+    })
+  }
+  
+
   
   async function updateGoogleMapPins(hotels, initialize = false){   
 
@@ -306,14 +434,8 @@ function location_not_found(){
           });
 
 
-          // let userMarker = new google.maps.marker.AdvancedMarkerElement({
-          //   position: pos,
-          //   map: map,            
-          //   content: PI_DATA.user_icon         
-          // });
-
-           // Set the map center to the user's location
-           map.setCenter(pos);
+          
+          map.setCenter(pos);
 
           $('#pi-address').attr('data-coordinates', position.coords.latitude + ',' + position.coords.longitude);
           infoWindow.setPosition(pos);
@@ -322,66 +444,67 @@ function location_not_found(){
 
          
 
-          const radiusInMeters = parseFloat(5 * 1609.34); // Convert miles to meters (conversion factor: 1 mile = 1609.34 meters)
-          const circle = new google.maps.Circle({
-            center: pos,
-            radius: radiusInMeters,
-          });
-      
-          // Fit the map to the bounds of the circle (including some padding)
-          map.fitBounds(circle.getBounds(), {
-            padding: 50, // Adjust padding as needed (in pixels)
-          });
+          /* Add Here Code to load map pin based on user location */
+
+          
+
+          showNearbyPlaces(pos.lat, pos.lng)
+
+          // setZoomToBounds(getLatLngBounds(parseFloat(5 * 1609.34)));
         },
         () => {          
           handleLocationError(true, infoWindow, map.getCenter());
+          showAllPins();
+          console('initial 2');
         },
       );
     } else {
       
       handleLocationError(true, infoWindow, map.getCenter());
+      showAllPins();
+      console('initial 3');
     }
     
  
-    $('#pi-map2').append(location_not_found());
-    // Create a new bounds object outside the loop
-    var bounds = new google.maps.LatLngBounds();
+    // $('#pi-map2').append(location_not_found());
+    // // Create a new bounds object outside the loop
+    // var bounds = new google.maps.LatLngBounds();
  
-    // Loop through the locations array to create map pins
-    $.each(hotels, function(index, hotel) {
-        const pin = new PinElement({
-          glyph: `${hotel.order}`,
-        });
+    // // Loop through the locations array to create map pins
+    // $.each(hotels, function(index, hotel) {
+    //     const pin = new PinElement({
+    //       glyph: `${hotel.order}`,
+    //     });
   
-       var coordinates = hotel.coordinates.split(",").map(function (coord) {
-         return parseFloat(coord.trim());
-       });
+    //    var coordinates = hotel.coordinates.split(",").map(function (coord) {
+    //      return parseFloat(coord.trim());
+    //    });
   
        
   
-        let marker = new AdvancedMarkerElement({
-            position: { lat: coordinates[0], lng: coordinates[1] },
-            map: map,            
-            title: hotel.title            
-        });
+    //     let marker = new AdvancedMarkerElement({
+    //         position: { lat: coordinates[0], lng: coordinates[1] },
+    //         map: map,            
+    //         title: hotel.title            
+    //     });
 
-        marker.content = buildContent(hotel, marker);
+    //     marker.content = buildContent(hotel, marker);
   
-        marker.addListener('click', ({ domEvent, latLng }) => {          
-          // centerMapOnCoordinates(latLng.lat(), latLng.lng()) 
-          var mapContainer = map.getDiv();         
-          toggleHighlight(marker, hotel);
-          map.panTo(latLng); // Center the map around the clicked marker with an offset
-          map.panBy(0, mapContainer.offsetHeight * -0.325);
-        });
+    //     marker.addListener('click', ({ domEvent, latLng }) => {          
+    //       // centerMapOnCoordinates(latLng.lat(), latLng.lng()) 
+    //       var mapContainer = map.getDiv();         
+    //       toggleHighlight(marker, hotel);
+    //       map.panTo(latLng); // Center the map around the clicked marker with an offset
+    //       map.panBy(0, mapContainer.offsetHeight * -0.325);
+    //     });
         
 
-        // Add marker to bounds
-        bounds.extend(marker.position);
-        markers.push(marker);
-    });
+    //     // Add marker to bounds
+    //     bounds.extend(marker.position);
+    //     markers.push(marker);
+    // });
 
-    map.fitBounds(bounds);
+    // map.fitBounds(bounds);
    
   }
 
@@ -874,9 +997,7 @@ function location_not_found(){
 
                       // console.log(data.coordinates);
                       updateGoogleMapPins(data.coordinates);
-                    }
-
-                    
+                    }                    
                  
                   }
                 }
