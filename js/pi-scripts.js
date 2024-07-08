@@ -20,6 +20,7 @@ $(function () {
 
   let map;
   var markers = []; // Array to store markers
+  
 
 
 function centerToDefault(){
@@ -191,12 +192,14 @@ function location_not_found(){
   }
 
 
-  function clearMarkers(markers) {
-    for (var i = 0; i < markers.length; i++) {
-      markers[i].setMap(null);
-    }
-    markers = [];
-  }
+  // function clearMarkers(markers) {
+  //   for (var i = 0; i < markers.length; i++) {
+  //     markers[i].setMap(null);
+  //   }
+  //   markers = [];
+  //   userMarker.setMap(null);
+  //   console.log('cleared');
+  // }
 
   function handleLocationError(browserHasGeolocation, infoWindow, pos) {
     infoWindow.setPosition(pos);
@@ -255,6 +258,7 @@ function location_not_found(){
 
   function showNearbyPlaces(lat, lng){
     $('#pi-map2').append(location_not_found());
+
     const latLng = [lat, lng];
     $address = $('.pi-address');
 
@@ -267,10 +271,13 @@ function location_not_found(){
 
     // Update Leaflet map center
     const miles = parseInt($("#miles a.active").data("miles"));
-    const radiusInMeters = miles * 1609.34; 
+    const radiusInMeters = 15 * 1609.34; 
 
     const user_lat = lat;
     const user_lang =lng;
+
+    
+    
 
     
     // const zoomLevel = calculateZoomLevel(map, latLng, miles);
@@ -287,20 +294,12 @@ function location_not_found(){
         lat: lat,
         lng: lng
       },
-      success: function ({ data, success }) {
+      success:  function ({ data, success }) {
         if (success){
+          
 
           let hotels = data.hotels;
-          // Create a user marker object
-          const userMarker = new google.maps.Marker({
-            position: {lat: user_lat, lng: user_lang },
-            map: map, // Reference your existing map object here
-            title: "Your Location", // Optional title for the marker
-            icon: { // Optional custom icon for the user pin
-              url: PI_DATA.user_icon,
-              scaledSize: new google.maps.Size(37, 56), // Adjust icon size as needed
-            },
-          });
+          
 
           
           let hotelsWithinRadius = data.lists.filter(function (hotel) {
@@ -316,7 +315,11 @@ function location_not_found(){
           // console.log('hotel with radius', hotelsWithinRadius);
           if (hotelsWithinRadius.length === 0) {
             $('.pi-not-found').removeClass('hide');
+
+            
+
             updateGoogleMapPins(PI_DATA.mapCoordinates, true);
+            userLocation({lat: user_lat, lng: user_lang});
             // centerMapOnCoordinates(29.76035220031458, -95.3665050615942);
 
             
@@ -329,15 +332,14 @@ function location_not_found(){
             $('.pi-hotel-lists').html(hotels);
 
             // console.log(data.coordinates);
-            updateGoogleMapPins(data.coordinates);
+            updateGoogleMapPins(data.coordinates, false);
+            userLocation({lat: user_lat, lng: user_lang});
           }                    
         
         }
       }
     })
-  }
-  
-
+  }  
   
   async function updateGoogleMapPins(hotels, initialize = false){   
 
@@ -346,9 +348,19 @@ function location_not_found(){
 
     clearMarkers(markers);
 
+  
     const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary("marker");
 
-    
+    // let userMarker = new AdvancedMarkerElement({
+    //   position: user_pos ,
+    //   map: map,
+    //   title: 'Your Location',
+    //   content: PI_DATA.user_icon
+    // });
+
+    // bounds.extend(userMarker.position);
+    // markers.push(userMarker);
+      
     $.each(hotels, function(index, hotel) {
   
       const pin = new PinElement({
@@ -359,13 +371,17 @@ function location_not_found(){
        return parseFloat(coord.trim());
      });
 
-     let marker = new AdvancedMarkerElement({
+     let hotel_payload = {
         position: { lat: coordinates[0], lng: coordinates[1] },
         map: map,
         title: hotel.title
-      });
+      };      
+
+     let marker = new AdvancedMarkerElement(hotel_payload);
 
       marker.content = buildContent(hotel, marker)
+
+      
 
       marker.addListener('click', ({ domEvent, latLng }) => {
         // centerMapOnCoordinates(latLng.lat(), latLng.lng())    
@@ -380,10 +396,37 @@ function location_not_found(){
        markers.push(marker);
     });
 
+    
+
     if (initialize){
       map.fitBounds(bounds);
     }
   }
+
+  async function userLocation(pos){
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    var bounds = new google.maps.LatLngBounds();
+    // Create a user marker object
+    
+    const glyphImg = document.createElement("img");
+    glyphImg.src =  PI_DATA.user_icon;
+
+    const userPayload = {
+      position: pos ,
+      map: map,
+      title: 'Your Location',
+      content: glyphImg
+    };
+
+    
+
+    let userMarker = new AdvancedMarkerElement(userPayload);
+    
+
+    bounds.extend(userMarker.position);
+    markers.push(userMarker);
+  }
+  
 
 
   async function initGoogleMap(){
@@ -422,16 +465,26 @@ function location_not_found(){
           };
           
 
+         
           // Create a user marker object
-          const userMarker = new google.maps.Marker({
-            position: pos,
-            map: map, // Reference your existing map object here
-            title: "Your Location", // Optional title for the marker
-            icon: { // Optional custom icon for the user pin
-              url: PI_DATA.user_icon,
-              scaledSize: new google.maps.Size(37, 56), // Adjust icon size as needed
-            },
-          });
+          // userMarker = new google.maps.Marker({
+          //   position: pos,
+          //   map: map, // Reference your existing map object here
+          //   title: "Your Location", // Optional title for the marker
+          //   icon: { // Optional custom icon for the user pin
+          //     url: PI_DATA.user_icon,
+          //     scaledSize: new google.maps.Size(37, 56), // Adjust icon size as needed
+          //   },
+          // });
+
+          // let userMarker = new AdvancedMarkerElement({
+          //   position: pos,
+          //   map: map,
+          //   title: 'Your Location',
+          //   content: PI_DATA.user_icon
+          // });
+
+          // markers.push(userMarker);
 
 
           
@@ -446,9 +499,9 @@ function location_not_found(){
 
           /* Add Here Code to load map pin based on user location */
 
-          
-
           showNearbyPlaces(pos.lat, pos.lng)
+
+          
 
           // setZoomToBounds(getLatLngBounds(parseFloat(5 * 1609.34)));
         },
@@ -679,9 +732,11 @@ function location_not_found(){
 
 
   function clearMarkers(markers) {
+    console.log('markers',markers);
     for (var i = 0; i < markers.length; i++) {
       markers[i].setMap(null);
     }
+    
   }
 
   function getLatLngBounds(distanceInMeters) {
@@ -934,7 +989,7 @@ function location_not_found(){
 
               // Update Leaflet map center
               const miles = parseInt($("#miles a.active").data("miles"));
-              const radiusInMeters = miles * 1609.34; 
+              const radiusInMeters = 15 * 1609.34; 
 
               const user_lat = data.lat;
               const user_lang = data.lng;
@@ -959,17 +1014,10 @@ function location_not_found(){
 
                     let hotels = data.hotels;
                     // Create a user marker object
-                    const userMarker = new google.maps.Marker({
-                      position: {lat: user_lat, lng: user_lang },
-                      map: map, // Reference your existing map object here
-                      title: "Your Location", // Optional title for the marker
-                      icon: { // Optional custom icon for the user pin
-                        url: PI_DATA.user_icon,
-                        scaledSize: new google.maps.Size(37, 56), // Adjust icon size as needed
-                      },
-                    });
+                    let user_position =  {lat: user_lat, lng: user_lang };
+                      
 
-                    
+                    userLocation(user_position); 
 
                     let hotelsWithinRadius = data.lists.filter(function (hotel) {
                       var coords = hotel.coordinates.split(",").map(function (coord) {
@@ -981,14 +1029,14 @@ function location_not_found(){
                       return distance <= radiusInMeters;
                     });
 
-                    // console.log('hotel with radius', hotelsWithinRadius);
+                    console.log('hotel with radius', hotelsWithinRadius);
                     if (hotelsWithinRadius.length === 0) {
                       $('.pi-not-found').removeClass('hide');
                       updateGoogleMapPins(PI_DATA.mapCoordinates, true);
                       // centerMapOnCoordinates(29.76035220031458, -95.3665050615942);
-
                       
-                      // console.log("No hotels found within a 15-mile radius.");
+                      
+                      console.log("No hotels found within a 15-mile radius.");
                       
                     } else{
                       $('.pi-not-found').addClass('hide');
@@ -997,7 +1045,8 @@ function location_not_found(){
 
                       // console.log(data.coordinates);
                       updateGoogleMapPins(data.coordinates);
-                    }                    
+                    }          
+                             
                  
                   }
                 }
