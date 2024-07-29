@@ -318,7 +318,8 @@ function location_not_found(){
 
             
 
-            updateGoogleMapPins(PI_DATA.mapCoordinates, true);
+            // updateGoogleMapPins(PI_DATA.mapCoordinates, true);
+            updateGoogleMapPins(data.coordinates, false);
             userLocation({lat: user_lat, lng: user_lang});
             // centerMapOnCoordinates(29.76035220031458, -95.3665050615942);
 
@@ -404,27 +405,27 @@ function location_not_found(){
   }
 
   async function userLocation(pos){
-    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
-    var bounds = new google.maps.LatLngBounds();
-    // Create a user marker object
+    // const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    // var bounds = new google.maps.LatLngBounds();
+    // // Create a user marker object
     
-    const glyphImg = document.createElement("img");
-    glyphImg.src =  PI_DATA.user_icon;
+    // const glyphImg = document.createElement("img");
+    // glyphImg.src =  PI_DATA.user_icon;
 
-    const userPayload = {
-      position: pos ,
-      map: map,
-      title: 'Your Location',
-      content: glyphImg
-    };
+    // const userPayload = {
+    //   position: pos ,
+    //   map: map,
+    //   title: 'Your Location',
+    //   content: glyphImg
+    // };
 
-    
-
-    let userMarker = new AdvancedMarkerElement(userPayload);
     
 
-    bounds.extend(userMarker.position);
-    markers.push(userMarker);
+    // let userMarker = new AdvancedMarkerElement(userPayload);
+    
+
+    // bounds.extend(userMarker.position);
+    // markers.push(userMarker);
   }
   
 
@@ -732,7 +733,7 @@ function location_not_found(){
 
 
   function clearMarkers(markers) {
-    console.log('markers',markers);
+    
     for (var i = 0; i < markers.length; i++) {
       markers[i].setMap(null);
     }
@@ -876,9 +877,6 @@ function location_not_found(){
   });
 
   
-
-
-
   $(".pi-book-now").each(function () {
     $(this).on("click", function () {
       const $parent = $(this).closest(".pi-poa-container");
@@ -1032,7 +1030,9 @@ function location_not_found(){
                     console.log('hotel with radius', hotelsWithinRadius);
                     if (hotelsWithinRadius.length === 0) {
                       $('.pi-not-found').removeClass('hide');
-                      updateGoogleMapPins(PI_DATA.mapCoordinates, true);
+                      // updateGoogleMapPins(PI_DATA.mapCoordinates, true);
+                      $('.pi-hotel-lists').html(hotels);
+                      updateGoogleMapPins(data.coordinates);
                       // centerMapOnCoordinates(29.76035220031458, -95.3665050615942);
                       
                       
